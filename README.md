@@ -38,6 +38,8 @@ If the Test stage fails, Build and Deploy are skipped, so broken code never goes
 ### Successful pipeline
 <img width="1408" height="881" alt="first stag done " src="https://github.com/user-attachments/assets/8691b3d8-213d-4c94-9411-2e717dd0fe46" />
 
+<img width="2813" height="1665" alt="first pipeline success" src="https://github.com/user-attachments/assets/2c9f6a72-8546-490a-8917-e7db17b84d0b" />
+
 
 ### Pipeline stopped by a failing test
 I changed a test on purpose to see what happens. Test failed, and Build and Deploy were skipped.
