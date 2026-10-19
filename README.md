@@ -36,25 +36,28 @@ If the Test stage fails, Build and Deploy are skipped, so broken code never goes
 ## Screenshots
 
 ### Successful pipeline
-SCREENSHOT: Stage View #1 and #2
+<img width="1408" height="881" alt="first stag done " src="https://github.com/user-attachments/assets/8691b3d8-213d-4c94-9411-2e717dd0fe46" />
+
 
 ### Pipeline stopped by a failing test
 I changed a test on purpose to see what happens. Test failed, and Build and Deploy were skipped.
 
-SCREENSHOT: Stage View #1 to #4
-SCREENSHOT: Console Output #3
+<img width="1408" height="881" alt="overall pipeline state" src="https://github.com/user-attachments/assets/084c21df-11b5-43f1-9dc9-93980f708431" />
+<img width="1408" height="881" alt="pipeline failure " src="https://github.com/user-attachments/assets/b19401c8-d786-4ddc-871b-346fe5153f8c" />
 
 ### App before and after a code change
 Pushing a change to `app.py` triggered a new build and the app updated automatically.
 
-SCREENSHOT: app before
-SCREENSHOT: app after
+<img width="2813" height="1655" alt="app run before change " src="https://github.com/user-attachments/assets/d6b01271-2ead-4382-869f-bd6609e8bb90" />
+<img width="1408" height="881" alt="successful deploy after change " src="https://github.com/user-attachments/assets/b9bfc600-1812-4982-9d2b-04542797311f" />
+
 
 ### Container running on EC2
-SCREENSHOT: docker ps
+<img width="2812" height="1544" alt="container-running-state" src="https://github.com/user-attachments/assets/5cd7a1da-25a6-47ea-9d86-bbfd994adb41" />
+
 
 ### Jenkins configuration
-SCREENSHOT: Jenkins config (repo URL)
+<img width="2813" height="1655" alt="Git-Url" src="https://github.com/user-attachments/assets/dd10ab2f-5fd7-46a9-89fa-193a03110067" />
 
 ## Problems I ran into and how I fixed them
 
