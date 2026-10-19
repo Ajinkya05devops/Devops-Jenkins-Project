@@ -1,34 +1,76 @@
-# CI/CD Pipeline with Jenkins and Docker
+# CI/CD Pipeline with Jenkins and Docker on AWS EC2
 
-A small Flask app with a Jenkins pipeline that **tests, builds, and deploys it automatically** every time code is pushed to GitHub.
+A hands-on DevOps project. Every time I push code to GitHub, Jenkins automatically tests the app, builds a Docker image, and deploys it to a server on AWS EC2.
 
-## Pipeline flow
+## How it works
 
 ```
-GitHub push -> Jenkins -> Test (pytest) -> Build (Docker image) -> Deploy (container on port 5001)
+GitHub push → Jenkins (checks for changes every 2 minutes) → Test → Build → Deploy
 ```
 
-If the Test stage fails, the pipeline stops and nothing is deployed.
+1. **Checkout:** Jenkins pulls the latest code from GitHub
+2. **Test:** runs the pytest tests
+3. **Build:** builds a Docker image tagged with the build number
+4. **Deploy:** replaces the running container with the new version on port 5001
+
+If the Test stage fails, Build and Deploy are skipped, so broken code never goes live.
 
 ## Tools used
 
-- Python (Flask) and Pytest
+- Jenkins (declarative pipeline, Pipeline script from SCM)
 - Docker
-- Jenkins (declarative pipeline, Pipeline from SCM)
+- AWS EC2 (Ubuntu)
+- Python, Flask, Pytest
 - Git and GitHub
 
-## Project structure
+## Project files
 
-```
-app.py              Flask app with / and /health routes
-test_app.py         Pytest tests
-requirements.txt    Python dependencies
-Dockerfile          Packages the app as a Docker image
-Jenkinsfile         Pipeline: Checkout, Test, Build, Deploy
-jenkins-setup/      Dockerfile for a Jenkins image that has Docker and Python
-```
+| File | Purpose |
+|---|---|
+| `app.py` | Small Flask app with `/` and `/health` routes |
+| `test_app.py` | Pytest tests for the app |
+| `requirements.txt` | Python dependencies |
+| `Dockerfile` | Packages the app as a Docker image |
+| `Jenkinsfile` | The pipeline: Checkout, Test, Build, Deploy |
 
-## Run the app locally
+## Screenshots
+
+### Successful pipeline
+SCREENSHOT: Stage View #1 and #2
+
+### Pipeline stopped by a failing test
+I changed a test on purpose to see what happens. Test failed, and Build and Deploy were skipped.
+
+SCREENSHOT: Stage View #1 to #4
+SCREENSHOT: Console Output #3
+
+### App before and after a code change
+Pushing a change to `app.py` triggered a new build and the app updated automatically.
+
+SCREENSHOT: app before
+SCREENSHOT: app after
+
+### Container running on EC2
+SCREENSHOT: docker ps
+
+### Jenkins configuration
+SCREENSHOT: Jenkins config (repo URL)
+
+## Problems I ran into and how I fixed them
+
+- **App would not load in the browser:** port 5001 was blocked. I added an inbound rule to the EC2 security group.
+- **Jenkins could not run Docker:** I added the `jenkins` user to the `docker` group and restarted Jenkins.
+- **Test stage needed Python venv:** I installed `python3-venv` on the server.
+- **Server ran low on memory:** I added a 2 GB swap file and moved to a larger instance (t3.small).
+
+## What I learned
+
+- How a CI/CD pipeline connects Git, Jenkins, and Docker
+- How a failing test blocks a deployment
+- How to read Jenkins console output to find errors
+- How EC2 security groups control access to a server
+
+## Run it locally
 
 ```
 pip install -r requirements.txt
@@ -36,48 +78,16 @@ pytest
 python app.py
 ```
 
-Open http://localhost:5000
-
-## Run with Docker
+Or with Docker:
 
 ```
 docker build -t myapp .
 docker run -p 5001:5000 myapp
 ```
 
-Open http://localhost:5001
+## Next steps
 
-## Set up Jenkins
-
-```
-cd jenkins-setup
-docker build -t my-jenkins .
-docker run -d --name jenkins -p 8080:8080 -p 50000:50000 \
-  -v jenkins_home:/var/jenkins_home \
-  -v /var/run/docker.sock:/var/run/docker.sock \
-  my-jenkins
-docker exec -u root jenkins chmod 666 /var/run/docker.sock
-```
-
-Then open http://localhost:8080, unlock Jenkins with
-`docker exec jenkins cat /var/jenkins_home/secrets/initialAdminPassword`,
-install the suggested plugins, and create a **Pipeline** job:
-
-- Definition: Pipeline script from SCM
-- SCM: Git, with this repo's URL, branch `*/main`
-- Script Path: `Jenkinsfile`
-
-Jenkins checks GitHub every 2 minutes (`pollSCM`), so no webhook is needed.
-
-## Note
-
-The `chmod 666` on the Docker socket is for a local learning setup only. Do not do this in production.
-
-## Screenshots
-
-Add your screenshots here:
-
-1. Jenkins Stage View with all stages green
-2. A failed build stopped at the Test stage
-3. The app running at http://localhost:5001
-4. `docker ps` showing the `myapp-live` container
+- Push images to Docker Hub
+- Add Slack or email notifications
+- Add a manual approval step before deploy
+- Create the server with Terraform
